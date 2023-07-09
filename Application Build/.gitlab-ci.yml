@@ -1,0 +1,17 @@
+default:
+  tags: 
+    - gitlab-runner-test
+
+stages:
+  - image_build
+
+Image Build:
+  variables:
+    region: "us-east-1"
+  stage: image_build
+  script:
+    - export aws_account_id=$(aws sts get-caller-identity | jq .'Account' | xargs)
+    - sudo docker build -t reactjs-image .
+    - sudo docker tag reactjs-image:latest $aws_account_id.dkr.ecr.$region.amazonaws.com/aws-ecs-reactjs-personal-portfolio
+    - aws ecr get-login-password --region $region | docker login --username AWS --password-stdin $aws_account_id.dkr.ecr.$region.amazonaws.com
+    - sudo docker push $aws_account_id.dkr.ecr.$region.amazonaws.com/aws-ecs-reactjs-personal-portfolio
