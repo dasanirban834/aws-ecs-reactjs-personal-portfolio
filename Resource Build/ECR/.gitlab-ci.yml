@@ -1,0 +1,13 @@
+default:
+  tags: 
+    - gitlab-runner-test
+
+stages:
+  - image_repo_create
+
+Image_Repository_Build:
+  stage: image_repo_create
+  script:
+    - terraform init
+    - terraform plan
+    - terraform apply --auto-approve
